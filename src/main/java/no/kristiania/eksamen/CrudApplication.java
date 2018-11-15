@@ -7,13 +7,19 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class CrudApplication {
 
 	public static void main(String[] args) {
-		String thing = System.getenv("SPRING_DATASOURCE_URL" );
-		System.out.println("SPRING_DATASOURCE_URL IS " + thing);
-		thing = System.getenv("SPRING_DATASOURCE_USERNAME");
-		System.out.println("SPRING_DATASOURCE_USERNAME IS " + thing);
+		String thing = System.getenv("JDBC_DATABASE_URL" );
+		System.out.println("JDBC_DATABASE_URL IS " + thing);
+		thing = System.getenv("JDBC_DATABASE_USERNAME");
+		System.out.println("JDBC_DATABASE_USERNAME IS " + thing);
 		thing = System.getenv("DATABASE_URL");
 		System.out.println("DATABASE_URL IS " + thing);
+
+		thing = System.getenv("DATABASE_USERNAME" );
+		System.out.println("DATABASE_USERNAME IS " + thing);
+		thing = System.getenv("DATABASE_PASSWORD");
+		System.out.println("DATABASE_PASSWORD IS " + thing);
 		//SpringApplication.run(CrudApplication.class, args);
+
 	}
 }
 
