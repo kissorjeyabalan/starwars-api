@@ -1,25 +1,42 @@
 package no.kristiania.eksamen;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
+import javax.sql.DataSource;
+
+@Configuration
 @SpringBootApplication
 public class CrudApplication {
-
 	public static void main(String[] args) {
-		String thing = System.getenv("JDBC_DATABASE_URL" );
-		System.out.println("JDBC_DATABASE_URL IS " + thing);
-		thing = System.getenv("JDBC_DATABASE_USERNAME");
-		System.out.println("JDBC_DATABASE_USERNAME IS " + thing);
-		thing = System.getenv("DATABASE_URL");
-		System.out.println("DATABASE_URL IS " + thing);
-
-		thing = System.getenv("DATABASE_USERNAME" );
-		System.out.println("DATABASE_USERNAME IS " + thing);
-		thing = System.getenv("DATABASE_PASSWORD");
-		System.out.println("DATABASE_PASSWORD IS " + thing);
-		//SpringApplication.run(CrudApplication.class, args);
-
+		SpringApplication.run(CrudApplication.class, args);
 	}
+
+	@Bean
+    @Primary
+    public DataSource dataSource() throws URISyntaxException {
+        URI dbUri = new URI(System.getenv("DATABASE_URL"));
+
+        String username = dbUri.getUserInfo().split(":")[0];
+        System.out.println("USERNAME IS " + username);
+        String password = dbUri.getUserInfo().split(":")[1];
+        System.out.println("PASSWORD IS " + password);
+        String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ":" + dbUri.getPort() + dbUri.getPath() + "?sslmode=require";
+        System.out.println("DB URL IS " + dbUrl);
+
+        return DataSourceBuilder.create()
+                .url(dbUrl)
+                .username(username)
+                .password(password)
+                .build();
+    }
 }
+
 
