@@ -6,10 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="eksamen" />
         <module name="pgr301-eksamen" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="eksamen" target="1.8" />
       <module name="pgr301-eksamen" target="1.8" />
     </bytecodeTargetLevel>
   </component>
