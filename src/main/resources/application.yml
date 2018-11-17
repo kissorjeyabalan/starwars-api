@@ -3,4 +3,4 @@ spring:
     hibernate:
       ddl-auto: none
 server:
-  port: $PORT
+  port: ${PORT:8080}
