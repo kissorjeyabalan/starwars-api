@@ -1,3 +1,5 @@
+drop table vehicles;
+
 create table vehicles (
   `id` bigint primary key auto_increment,
   `creation_time` timestamp not null,

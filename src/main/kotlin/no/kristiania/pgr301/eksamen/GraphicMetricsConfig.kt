@@ -19,9 +19,11 @@ class GraphicMetricsConfig {
 
     @Bean
     fun getReporter(registry: MetricRegistry): GraphiteReporter {
-        val graphite = Graphite(InetSocketAddress(System.getenv("GRAPHITE_HOST"), 2003))
+        val host: String? = System.getenv("GRAPHITE_HOST") ?: ""
+        val key: String? = System.getenv("HOSTEDGRAPHITE_KEY") ?: ""
+        val graphite = Graphite(InetSocketAddress(host!!, 2003))
         val graphiteReporter = GraphiteReporter.forRegistry(registry)
-                .prefixedWith(System.getenv("HOSTEDGRAPHITE_KEY"))
+                .prefixedWith(key!!)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .filter(MetricFilter.ALL)

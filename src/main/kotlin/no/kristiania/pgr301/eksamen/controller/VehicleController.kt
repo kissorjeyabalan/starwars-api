@@ -41,7 +41,7 @@ class VehicleController {
             dto: VehicleDto
     ): ResponseEntity<WrappedResponse<VehicleDto>> {
         metrics.meter("ReplaceVehicle").mark()
-        val timer = metrics.timer("ReplaceVehicle").time()
+        val timer = metrics.timer("ReplaceVehicle-Timer").time()
 
         try {
             val pathId: Long
@@ -102,7 +102,7 @@ class VehicleController {
             @RequestBody dto: VehicleDto
     ): ResponseEntity<Void> {
         metrics.meter("CreateVehicle").mark()
-        val timer = metrics.timer("CreateVehicle").time()
+        val timer = metrics.timer("CreateVehicle-Timer").time()
 
         try {
             if (dto.name.isNullOrEmpty() || dto.model.isNullOrEmpty()) {
@@ -153,7 +153,7 @@ class VehicleController {
             limit: Int
     ): ResponseEntity<WrappedResponse<HalPage<VehicleDto>>> {
         metrics.meter("GetAllVehicles").mark()
-        val timer = metrics.timer("GetAllVehicles").time()
+        val timer = metrics.timer("GetAllVehicles-Timer").time()
 
         try {
             if (page < 1 || limit < 1) {
