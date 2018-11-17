@@ -1,5 +1,6 @@
 package no.kristiania.pgr301.eksamen.controller
 
+import com.codahale.metrics.*
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -17,7 +18,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import java.lang.Exception
-import java.time.ZonedDateTime
 
 @Api(value = "/vehicles", description = "Information about various vehicles throughout the galaxy")
 @RequestMapping(
@@ -27,8 +27,9 @@ import java.time.ZonedDateTime
 @RestController
 class VehicleController {
     @Autowired lateinit var repo: VehicleRepository
+    @Autowired lateinit var metrics: MetricRegistry
 
-    @ApiOperation("Update an existing vehicle resource by ID")
+    @ApiOperation("Replace an existing vehicle resource by ID")
     @PutMapping(path = ["/{id}"])
     fun replaceVehicle(
             @ApiParam("Vehicle ID")
@@ -39,36 +40,43 @@ class VehicleController {
             @RequestBody
             dto: VehicleDto
     ): ResponseEntity<WrappedResponse<VehicleDto>> {
-        val pathId: Long
-        val dtoId: Long
-        try {
-            pathId = id.toLong()
-            dtoId = dto.id!!.toLong()
-        } catch (e: Exception) {
-            return resourceNotFoundEntity()
-        }
-
-        if (dtoId != pathId) {
-            return errorEntity(409, "Path and body ID mismatch")
-        }
-
-        if (!repo.existsById(dtoId)) {
-            return resourceNotFoundEntity()
-        }
-
-        if (dto.name.isNullOrEmpty() || dto.model.isNullOrEmpty()) {
-            return errorEntity(400, "Illegal state for name or model")
-        }
-
-        val vehicleEntity = VehicleConverter.transform(dto)
+        metrics.meter("ReplaceVehicle").mark()
+        val timer = metrics.timer("ReplaceVehicle").time()
 
         try {
-            repo.save(vehicleEntity)
-        } catch (e: Exception) {
-            throw e
-        }
+            val pathId: Long
+            val dtoId: Long
+            try {
+                pathId = id.toLong()
+                dtoId = dto.id!!.toLong()
+            } catch (e: Exception) {
+                return resourceNotFoundEntity()
+            }
 
-        return ResponseEntity.status(204).build()
+            if (dtoId != pathId) {
+                return errorEntity(409, "Path and body ID mismatch")
+            }
+
+            if (!repo.existsById(dtoId)) {
+                return resourceNotFoundEntity()
+            }
+
+            if (dto.name.isNullOrEmpty() || dto.model.isNullOrEmpty()) {
+                return errorEntity(400, "Illegal state for name or model")
+            }
+
+            val vehicleEntity = VehicleConverter.transform(dto)
+
+            try {
+                repo.save(vehicleEntity)
+            } catch (e: Exception) {
+                throw e
+            }
+
+            return ResponseEntity.status(204).build()
+        } finally {
+            timer.stop()
+        }
     }
 
     @ApiOperation("Delete an existing vehicle resource by ID")
@@ -78,6 +86,8 @@ class VehicleController {
             @PathVariable("id")
             vehicleId: String
     ): ResponseEntity<WrappedResponse<VehicleDto>> {
+        metrics.meter("DeleteVehicle").mark()
+
         val pathId: Long? = vehicleId.toLongOrNull() ?:
                 return ResponseEntity.status(404).build()
 
@@ -91,21 +101,25 @@ class VehicleController {
             @ApiParam("Model of vehicle to insert. ID, creationTime and updated is ignored if supplied.")
             @RequestBody dto: VehicleDto
     ): ResponseEntity<Void> {
-        if (dto.name.isNullOrEmpty() || dto.model.isNullOrEmpty()) {
-            return ResponseEntity.status(400).build()
+        metrics.meter("CreateVehicle").mark()
+        val timer = metrics.timer("CreateVehicle").time()
 
+        try {
+            if (dto.name.isNullOrEmpty() || dto.model.isNullOrEmpty()) {
+                return ResponseEntity.status(400).build()
+
+            }
+            val created = repo.save(VehicleEntity(name = dto.name!!, model = dto.model!!))
+
+            return ResponseEntity.created(
+                    UriComponentsBuilder
+                            .fromPath("/vehicles/${created.id}")
+                            .build()
+                            .toUri()
+            ).build()
+        } finally {
+            timer.stop()
         }
-        val created = repo.save(
-                VehicleEntity(name = dto.name!!, model = dto.model!!,
-                creationTime = ZonedDateTime.now(), updated = ZonedDateTime.now())
-        )
-
-        return ResponseEntity.created(
-                UriComponentsBuilder
-                        .fromPath("/vehicles/${created.id}")
-                        .build()
-                        .toUri()
-        ).build()
     }
 
     @ApiOperation("Get a specific vehicle resource by ID")
@@ -114,6 +128,8 @@ class VehicleController {
         @PathVariable("id")
         pathId: Long?
     ): ResponseEntity<WrappedResponse<VehicleDto>> {
+        metrics.meter("GetVehicle").mark()
+
         val dto = repo.findById(pathId!!).orElse(null) ?:
                 return resourceNotFoundEntity()
 
@@ -136,43 +152,50 @@ class VehicleController {
             @RequestParam("limit", defaultValue = "10")
             limit: Int
     ): ResponseEntity<WrappedResponse<HalPage<VehicleDto>>> {
-        if (page < 1 || limit < 1) {
-            return ResponseEntity.status(400).body(
-                    WrappedResponse<HalPage<VehicleDto>>(
-                            code = 400,
-                            message = "Malformed page or limit supplied"
+        metrics.meter("GetAllVehicles").mark()
+        val timer = metrics.timer("GetAllVehicles").time()
+
+        try {
+            if (page < 1 || limit < 1) {
+                return ResponseEntity.status(400).body(
+                        WrappedResponse<HalPage<VehicleDto>>(
+                                code = 400,
+                                message = "Malformed page or limit supplied"
+                        ).validated()
+                )
+            }
+            val entityList = repo.findAll().toList()
+            val dto = VehicleConverter.transform(entityList, page, limit)
+
+            val uriBuilder = UriComponentsBuilder.fromPath("/vehicles")
+            dto._self = HalLink(uriBuilder.cloneBuilder()
+                    .queryParam("page", page)
+                    .queryParam("limit", limit)
+                    .build().toString())
+
+            if (!entityList.isEmpty() && page > 1) {
+                dto.previous = HalLink(uriBuilder.cloneBuilder()
+                        .queryParam("page", page - 1)
+                        .queryParam("limit", limit)
+                        .build().toString())
+            }
+
+            if (((page) * limit) < entityList.size) {
+                dto.next = HalLink(uriBuilder.cloneBuilder()
+                        .queryParam("page", page + 1)
+                        .queryParam("limit", limit)
+                        .build().toString())
+            }
+
+            return ResponseEntity.ok(
+                    WrappedResponse(
+                            code = 200,
+                            data = dto
                     ).validated()
             )
+        } finally {
+            timer.stop()
         }
-        val entityList = repo.findAll().toList()
-        val dto = VehicleConverter.transform(entityList, page, limit)
-
-        val uriBuilder = UriComponentsBuilder.fromPath("/vehicles")
-        dto._self = HalLink(uriBuilder.cloneBuilder()
-                .queryParam("page", page)
-                .queryParam("limit", limit)
-                .build().toString())
-
-        if (!entityList.isEmpty() && page > 1) {
-            dto.previous = HalLink(uriBuilder.cloneBuilder()
-                    .queryParam("page", page - 1)
-                    .queryParam("limit", limit)
-                    .build().toString())
-        }
-
-        if (((page) * limit) < entityList.size) {
-            dto.next = HalLink(uriBuilder.cloneBuilder()
-                    .queryParam("page", page + 1)
-                    .queryParam("limit", limit)
-                    .build().toString())
-        }
-
-        return ResponseEntity.ok(
-                WrappedResponse(
-                        code = 200,
-                        data = dto
-                ).validated()
-        )
     }
 
     private fun resourceNotFoundEntity(): ResponseEntity<WrappedResponse<VehicleDto>> {

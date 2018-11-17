@@ -17,7 +17,7 @@ class GraphicMetricsConfig {
         return MetricRegistry()
     }
 
-    //@Bean
+    @Bean
     fun getReporter(registry: MetricRegistry): GraphiteReporter {
         val graphite = Graphite(InetSocketAddress(System.getenv("GRAPHITE_HOST"), 2003))
         val graphiteReporter = GraphiteReporter.forRegistry(registry)

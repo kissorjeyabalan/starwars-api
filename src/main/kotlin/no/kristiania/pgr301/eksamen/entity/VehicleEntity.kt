@@ -19,10 +19,10 @@ class VehicleEntity (
         var model: String,
 
         @get:NotNull
-        var creationTime: ZonedDateTime,
+        var creationTime: ZonedDateTime? = null,
 
         @get:NotNull
-        var updated: ZonedDateTime
+        var updated: ZonedDateTime? = null
 ) {
     @PrePersist
     fun onCreate() {

@@ -23,8 +23,8 @@ class VehicleConverter {
                     id = dto.id?.toLong(),
                     name = dto.name!!,
                     model = dto.model!!,
-                    creationTime = ZonedDateTime.now(),
-                    updated = ZonedDateTime.now()
+                    creationTime = dto.created,
+                    updated = dto.updated
             )
         }
 
