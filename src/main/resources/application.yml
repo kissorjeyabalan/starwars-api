@@ -3,4 +3,4 @@ spring:
     hibernate:
       ddl-auto: create-drop
 server:
-  port: ${PORT:8080}
+  port: ${PORT:5000}
