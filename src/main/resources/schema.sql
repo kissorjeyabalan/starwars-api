@@ -1,4 +1,4 @@
-drop table vehicles;
+drop table if exists vehicles;
 
 create table vehicles (
   `id` bigint primary key auto_increment,
