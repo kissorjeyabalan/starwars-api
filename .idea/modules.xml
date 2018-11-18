@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/eksamen.iml" filepath="$PROJECT_DIR$/eksamen.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sw-api.iml" filepath="$PROJECT_DIR$/sw-api.iml" />
     </modules>
   </component>
 </project>
