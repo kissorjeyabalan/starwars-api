@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Api(value = "/vehicles", description ="Information about various vehicles throughout the galaxy")
@@ -30,6 +32,17 @@ public class VehicleController {
     public VehicleController(VehicleRepository repo, MetricRegistry registry) {
         this.repo = repo;
         this.metric = registry;
+
+        List<VehicleEntity> defaultEntities = new ArrayList<>();
+        defaultEntities.add(new VehicleEntity(null, "Sand Crawler", "Digger Crawler"));
+        defaultEntities.add(new VehicleEntity(null, "Sail Barge", "Modified Luxury Sail Barge"));
+        defaultEntities.add(new VehicleEntity(null, "TIE Bomber", "TIE/SA Bomber"));
+        defaultEntities.add(new VehicleEntity(null, "Snowspeeder", "T-47 Airspeeder"));
+        defaultEntities.add(new VehicleEntity(null, "AT-AT", "All Terrain Armored Transport"));
+        defaultEntities.add(new VehicleEntity(null, "AT-ST", "All Terrain Scout Transport"));
+
+        repo.saveAll(defaultEntities);
+
     }
 
     @ApiOperation("Create a new vehicle resource")
