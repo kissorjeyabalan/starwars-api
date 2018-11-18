@@ -54,7 +54,7 @@ public class CrudApplication {
 
     @Bean
     @Primary
-    @Profile("prod")
+    @Profile("!test")
     public DataSource dataSource() throws URISyntaxException {
         URI dbUri = new URI(System.getenv("DATABASE_URL"));
 
