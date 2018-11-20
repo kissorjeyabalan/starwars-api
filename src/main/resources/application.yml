@@ -10,7 +10,6 @@ spring:
 server:
   port: ${PORT:5000}
 
-properties
 ---
 
 spring:
