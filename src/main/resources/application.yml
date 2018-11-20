@@ -11,7 +11,7 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-    platform: h2s
+    platform: h2
   h2:
     console:
       enabled: false
