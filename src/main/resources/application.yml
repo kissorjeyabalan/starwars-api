@@ -2,5 +2,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults: false
 server:
-  port: ${PORT:8080}
+  port: ${PORT}
