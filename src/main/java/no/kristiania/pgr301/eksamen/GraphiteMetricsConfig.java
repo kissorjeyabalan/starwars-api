@@ -20,9 +20,7 @@ public class GraphiteMetricsConfig {
     @Bean
     public GraphiteReporter getReporter(MetricRegistry registry) {
         String host = System.getenv("GRAPHITE_HOST");
-        System.out.println("HOST IS " + host);
-        String apiKey = System.getenv("HOSTEDGRAPHITE_KEY");
-        System.out.println("API KEY IS " + apiKey);
+        String apiKey = System.getenv("HOSTEDGRAPHITE_APIKEY");
 
         if (host == null || apiKey == null) {
             return null;
