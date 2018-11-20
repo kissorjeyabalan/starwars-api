@@ -2,7 +2,7 @@ package no.kristiania.pgr301.eksamen;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.jdbc.DataSourceBuilder;
+/*import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
@@ -18,13 +18,13 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.sql.DataSource;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URISyntaxException;*/
 
-@EnableSwagger2
+//@EnableSwagger2
 @SpringBootApplication
 public class CrudApplication {
 
-    @Bean
+    /*@Bean
     public Docket swaggerApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
@@ -50,7 +50,7 @@ public class CrudApplication {
                 registry.addRedirectViewController("/", "/swagger-ui.html");
             }
         };
-    }
+    }*/
 
 	public static void main(String[] args) {
 		SpringApplication.run(CrudApplication.class, args);

@@ -2,9 +2,9 @@ package no.kristiania.pgr301.eksamen.controller;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import io.swagger.annotations.Api;
+/*import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiParam;*/
 import no.kristiania.pgr301.eksamen.converter.VehicleConverter;
 import no.kristiania.pgr301.eksamen.dto.VehicleDto;
 import no.kristiania.pgr301.eksamen.entity.VehicleEntity;
@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Api(value = "/vehicles", description ="Information about various vehicles throughout the galaxy")
-@RequestMapping(path = "/vehicles", produces = MediaType.APPLICATION_JSON_VALUE)
+//@Api(value = "/vehicles", description ="Information about various vehicles throughout the galaxy")
+@RequestMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class VehicleController {
 
@@ -45,10 +45,10 @@ public class VehicleController {
 
     }
 
-    @ApiOperation("Create a new vehicle resource")
-    @PostMapping
+    //@ApiOperation("Create a new vehicle resource")
+    @PostMapping(path = "/vehicles")
     public ResponseEntity<Void> createVehicle(
-            @ApiParam("Vehicle to insert. ID is ignored if supplied.")
+            //@ApiParam("Vehicle to insert. ID is ignored if supplied.")
             @RequestBody VehicleDto dto
     ) {
         metric.meter(MetricRegistry.name(VehicleController.class, "create", "count")).mark();
@@ -75,14 +75,14 @@ public class VehicleController {
         }
     }
 
-    @ApiOperation("Get all vehicles")
-    @GetMapping(produces = Format.HAL_V1)
+    //@ApiOperation("Get all vehicles")
+    @GetMapping(path = "/vehicles", produces = Format.HAL_V1)
     public ResponseEntity<Page<VehicleEntity>> getAllVehicles(
-            @ApiParam("Page to retrieve")
+            //@ApiParam("Page to retrieve")
             @RequestParam(value = "page", defaultValue = "1")
             int page,
 
-            @ApiParam("Number of items to retrieve per page")
+            //@ApiParam("Number of items to retrieve per page")
             @RequestParam(value = "limit", defaultValue = "10")
             int limit
     ) {
@@ -104,8 +104,8 @@ public class VehicleController {
         }
     }
 
-    @ApiOperation("Get a specific vehicle resource by ID")
-    @GetMapping(path = "/{id}")
+    //@ApiOperation("Get a specific vehicle resource by ID")
+    @GetMapping(path = "vehicles/{id}")
     public ResponseEntity<VehicleDto> getVehicle(
         @PathVariable("id")
         String pathId
@@ -132,10 +132,10 @@ public class VehicleController {
         }
     }
 
-    @ApiOperation("Delete an existing vehicle resource by ID")
-    @DeleteMapping(path = "/{id}")
+    //@ApiOperation("Delete an existing vehicle resource by ID")
+    @DeleteMapping(path = "vehicles/{id}")
     public ResponseEntity<Void> deleteVehicle(
-            @ApiParam("Vehicle ID to delete")
+            //@ApiParam("Vehicle ID to delete")
             @PathVariable("id")
             String pathId
     ) {
@@ -159,14 +159,14 @@ public class VehicleController {
         }
     }
 
-    @ApiOperation("Replace an existing vehicle resource by ID")
-    @PutMapping(path = "/{id}")
+    //@ApiOperation("Replace an existing vehicle resource by ID")
+    @PutMapping(path = "vehicles/{id}")
     public ResponseEntity<VehicleDto> replaceVehicle(
-            @ApiParam("Vehicle ID")
+            //@ApiParam("Vehicle ID")
             @PathVariable("id")
             String pathId,
 
-            @ApiParam("Data to replace current resource with. Path ID and data ID must match.")
+            //@ApiParam("Data to replace current resource with. Path ID and data ID must match.")
             @RequestBody VehicleDto dto
     ) {
         metric.meter(MetricRegistry.name(VehicleController.class, "replace", "count")).mark();

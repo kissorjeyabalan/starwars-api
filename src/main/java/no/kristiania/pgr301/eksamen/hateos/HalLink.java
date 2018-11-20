@@ -1,8 +1,8 @@
 package no.kristiania.pgr301.eksamen.hateos;
 
-import io.swagger.annotations.ApiModelProperty;
+//import io.swagger.annotations.ApiModelProperty;
 
 public class HalLink {
-    @ApiModelProperty
+    //@ApiModelProperty
     public String href = "";
 }
