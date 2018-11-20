@@ -7,4 +7,4 @@ spring:
         temp:
           use_jdbc_metadata_defaults: false
 server:
-  port: ${PORT}
+  port: ${PORT:5000}
