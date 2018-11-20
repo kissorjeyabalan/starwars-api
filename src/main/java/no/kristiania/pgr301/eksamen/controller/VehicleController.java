@@ -47,6 +47,7 @@ public class VehicleController {
 
     @GetMapping
     public String welcome() {
+        metric.meter(MetricRegistry.name(VehicleController.class, "welcome", "count")).mark();
         return "You can do GET and POST at the endpoint /vehicles. The json body for POST is: {'name':'string', 'model':'string'}. " +
                 "PUT and DELETE can be done at /vehicles/{id}. PUT expects same body as POST, but with an additional string field named id.";
     }
